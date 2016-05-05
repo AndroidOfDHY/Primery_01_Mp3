@@ -11,7 +11,7 @@ public class Mp3ListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mp3list);
+        setContentView(R.layout.mp3item);
     }
 
 

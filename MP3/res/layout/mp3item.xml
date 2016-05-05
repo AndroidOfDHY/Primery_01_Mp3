@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView 
+        android:id="@+id/song"
+        style="@style/textview_style"
+        android:textSize="20sp"
+        android:text="歌曲名"
+        android:maxLength="2"
+        />
+    
+    <TextView 
+        android:id="@+id/signer"
+        style="@style/textview_style"
+        android:layout_marginLeft="20px"
+        android:textSize="14sp"
+        android:text="作者"
+        android:textStyle="bold"
+        />
+
+</LinearLayout>
+
