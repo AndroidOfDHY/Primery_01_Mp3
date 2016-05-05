@@ -18,27 +18,27 @@ public class Mp3PlayerActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		FrameLayout linearLayout = new FrameLayout(this);
-		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.MATCH_PARENT,
-				FrameLayout.LayoutParams.MATCH_PARENT);
+//		FrameLayout linearLayout = new FrameLayout(this);
+//		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+//				FrameLayout.LayoutParams.MATCH_PARENT,
+//				FrameLayout.LayoutParams.MATCH_PARENT);
+//		
+//		FrameLayout.LayoutParams txtparams = new FrameLayout.LayoutParams(
+//				FrameLayout.LayoutParams.WRAP_CONTENT,
+//				FrameLayout.LayoutParams.WRAP_CONTENT);
+//		TextView textview = new TextView(this);
+//		textview.setLayoutParams(txtparams);
+//		textview.setText("宁波大红鹰学院");
+//		textview.setTextSize(20);
+//		TextView textview1 = new TextView(this);
+//		textview1.setLayoutParams(txtparams);
+//		textview1.setText("信息工程学院");
+//		textview1.setTextSize(20);
+//		linearLayout.addView(textview, txtparams);
+//		linearLayout.addView(textview1, txtparams);
+//		addContentView(linearLayout, params);
 		
-		FrameLayout.LayoutParams txtparams = new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				FrameLayout.LayoutParams.WRAP_CONTENT);
-		TextView textview = new TextView(this);
-		textview.setLayoutParams(txtparams);
-		textview.setText("宁波大红鹰学院");
-		textview.setTextSize(20);
-		TextView textview1 = new TextView(this);
-		textview1.setLayoutParams(txtparams);
-		textview1.setText("信息工程学院");
-		textview1.setTextSize(20);
-		linearLayout.addView(textview, txtparams);
-		linearLayout.addView(textview1, txtparams);
-		addContentView(linearLayout, params);
-		
-//		setContentView(R.layout.activity_mp3player);
+		setContentView(R.layout.activity_mp3player);
 //		
 //		this.seek = (SeekBar) super.findViewById(R.id.seekbar);
 //		this.text = (TextView) super.findViewById(R.id.text);

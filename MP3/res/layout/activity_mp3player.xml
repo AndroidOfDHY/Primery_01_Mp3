@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
@@ -31,7 +31,7 @@
         android:layout_gravity="bottom"
         />
     
-</FrameLayout>
+</FrameLayout> -->
 
 <!-- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -79,3 +79,49 @@
 	    />
 
 </LinearLayout> -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@color/black"
+    android:gravity="center"
+    >
+    
+    <ImageView 
+        android:id="@+id/previous"
+        android:src="@drawable/previous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        
+        />
+    
+    <ImageView 
+        android:id="@+id/srart"
+        android:src="@drawable/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/previous"
+        android:layout_marginLeft="20dp"
+        />
+    
+    <ImageView 
+        android:id="@+id/stop"
+        android:src="@drawable/stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/srart"
+        android:layout_marginLeft="20dp"
+        />
+    
+    <ImageView 
+        android:id="@+id/next"
+        android:src="@drawable/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/stop"
+        android:layout_marginLeft="20dp"
+        />
+    
+</RelativeLayout>
