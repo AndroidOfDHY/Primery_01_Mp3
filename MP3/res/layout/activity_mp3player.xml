@@ -5,6 +5,13 @@
     android:orientation="vertical"
     tools:context="com.dhy.mp3.Mp3PlayerActivity" >
 
+    <com.dhy.utils.LycirView
+        android:id="@+id/lrc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="这里是歌词"
+        />
+    
     <SeekBar 
 		android:id="@+id/seekbar"
 		android:layout_width="match_parent"
