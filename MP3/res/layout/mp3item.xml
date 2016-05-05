@@ -4,6 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
+    <ImageView 
+        android:id="@+id/itemicon"
+        android:src="@drawable/itemicon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        />
+    
     <TextView 
         android:id="@+id/song"
         style="@style/textview_style"
