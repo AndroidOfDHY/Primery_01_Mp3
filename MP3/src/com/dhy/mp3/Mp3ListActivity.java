@@ -4,14 +4,21 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 
 public class Mp3ListActivity extends Activity {
-
+	private String[] data = { "多情的月光", "假如爱有天意", "年轮" };
+	private ListView listView = null;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.mp3item);
+        setContentView(R.layout.activity_mp3list);
+		this.listView = (ListView) super.findViewById(R.id.list);
+		this.listView.setAdapter(new ArrayAdapter<String>(this,
+				android.R.layout.simple_expandable_list_item_1, this.data));
     }
 
 
