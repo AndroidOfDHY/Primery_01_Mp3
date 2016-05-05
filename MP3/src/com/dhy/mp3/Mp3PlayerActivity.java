@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -15,11 +16,29 @@ public class Mp3PlayerActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_mp3player);
-		this.seek = (SeekBar) super.findViewById(R.id.seekbar);
-		this.text = (TextView) super.findViewById(R.id.text);
-		this.text.setMovementMethod(ScrollingMovementMethod.getInstance());
-		this.seek.setOnSeekBarChangeListener(new OnSeekBarChangeListenerImpl());
+		
+		LinearLayout linearLayout = new LinearLayout(this);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.MATCH_PARENT);
+		linearLayout.setOrientation(LinearLayout.VERTICAL);
+		
+		LinearLayout.LayoutParams txtparams = new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
+		TextView textview = new TextView(this);
+		textview.setLayoutParams(txtparams);
+		textview.setText("宁波大红鹰学院");
+		textview.setTextSize(20);
+		linearLayout.addView(textview, txtparams);
+		addContentView(linearLayout, params);
+		
+//		setContentView(R.layout.activity_mp3player);
+		
+//		this.seek = (SeekBar) super.findViewById(R.id.seekbar);
+//		this.text = (TextView) super.findViewById(R.id.text);
+//		this.text.setMovementMethod(ScrollingMovementMethod.getInstance());
+//		this.seek.setOnSeekBarChangeListener(new OnSeekBarChangeListenerImpl());
 	}
 	
 	private class OnSeekBarChangeListenerImpl implements SeekBar.OnSeekBarChangeListener {
