@@ -76,5 +76,64 @@ public final class DataUtils {
 		}
 	}
 
+	/*
+	 * 解析SDCard xml文件
+	 * @param parser
+	 * @return MP3歌曲信息列表
+	 */
+	public static List<MP3> ParseXml(XmlPullParser parser) throws Exception{
+		List<MP3> dataList = null; // 歌曲列表
+		MP3 data = null; // 歌曲对象
+		
+		// 开始解析事件 ：得到第一个事件类型
+		int eventType = parser.getEventType();
+		// 处理事件：不碰到文档结束就一直处理
+		while (eventType != XmlPullParser.END_DOCUMENT){
+			switch (eventType) {
+			case XmlPullParser.START_DOCUMENT:
+				//不做任何处理或初始化数据列表
+				dataList = new ArrayList<MP3>();
+				break;
+            case XmlPullParser.START_TAG:
+            	// 解析每个XML节点
+            	// 获取当前标签名字
+				String tagName = parser.getName();
+				
+				// 根据不同名字做不同的处理
+				if(tagName.equalsIgnoreCase("resource")){
+					// 对象开始标志，需要新建对象
+					data = new MP3();
+				}else if (tagName.equalsIgnoreCase("id")){
+					data.setId(Integer.parseInt(parser.nextText()));
+				}else if (tagName.equalsIgnoreCase("mp3.name")){
+					data.setMp3name(parser.nextText());
+				}else if (tagName.equalsIgnoreCase("mp3.size")){
+					data.setMp3size(Long.parseLong(parser.nextText()));
+				}else if (tagName.equalsIgnoreCase("mp3.singer")){
+					data.setMp3singer(parser.nextText());
+				}else if (tagName.equalsIgnoreCase("lrc.name")){
+					data.setLrcname(parser.nextText());
+				}else if (tagName.equalsIgnoreCase("lrc.size")){
+					data.setLrcsize(Long.parseLong(parser.nextText()));
+				}
+				break;
+            case XmlPullParser.END_TAG:
+            	//一个对象数据读取结束，需要加入列表
+            	if("resource".equalsIgnoreCase(parser.getName())){
+            		dataList.add(data);
+            		data = null;
+            	}
+	            break;
+            case XmlPullParser.END_DOCUMENT:
+            	//一般不做处理
+	
+            	break;
 
+			default:
+				break;
+			}
+			eventType = parser.next();// 不要忘记，否则会死循环
+		}
+		return dataList;  // 返回数据列表
+	}
 }
