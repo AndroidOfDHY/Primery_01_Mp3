@@ -16,9 +16,9 @@ public class Mp3ListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mp3list);
-		this.listView = (ListView) super.findViewById(R.id.list);
-		this.listView.setAdapter(new ArrayAdapter<String>(this,
-				android.R.layout.simple_expandable_list_item_1, this.data));
+//		this.listView = (ListView) super.findViewById(R.id.list);
+//		this.listView.setAdapter(new ArrayAdapter<String>(this,
+//				android.R.layout.simple_expandable_list_item_1, this.data));
     }
 
 
