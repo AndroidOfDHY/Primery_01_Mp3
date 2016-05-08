@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 
 /**
@@ -27,8 +28,33 @@ public class StartActivity extends Activity {
 	}
 
 	private void init() {
+		// 传递数据
+		String data ="Hello";
+		
 		Intent intent = new Intent(context,Mp3ListActivity.class);
-		startActivity(intent);
+		intent.putExtra("extra_data", data);
+		
+		//startActivity(intent);
+		//需要返回结果
+		startActivityForResult(intent, 1);
 	}
+	// 接收返回数据
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case 1: // 这是发给本Activity的
+			if(resultCode == RESULT_OK){
+				String returnedData = data.getStringExtra("data_return");
+				Log.d("TAG",returnedData);
+			}
+			
+			break;
+
+		default:
+			break;
+		}
+	}
+	
 
 }
