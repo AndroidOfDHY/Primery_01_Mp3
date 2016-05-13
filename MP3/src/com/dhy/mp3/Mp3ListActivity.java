@@ -39,6 +39,11 @@ public class Mp3ListActivity extends Activity {
 	}
 
 	public class MyListAdapter extends BaseAdapter {
+		//定义一个ViewHolder的内部类
+		private class ViewHolder{
+			TextView mp3Name;
+			TextView mp3Singer;
+		}
 		private List<MP3> mAllList; // 需要提供的数据集合
 
 		public MyListAdapter() {
@@ -68,18 +73,23 @@ public class Mp3ListActivity extends Activity {
 		// 编写adapter最重要的就是重写此方法，此方法也是决定listview界面的样式
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			// 当convertView不为空的时候直接重新使用convertView从而减少了很多不必要的View的创建
-
-			if (convertView == null) {
-				// 使用LayoutInfalter对象来导入布局
-				convertView = View.inflate(Mp3ListActivity.this,
+			ViewHolder holder = null; // 定义ViewHolder实例对象
+			if (convertView !=null ){// convertView不为空，则
+				holder = (ViewHolder)convertView.getTag();//重复利用已经创建的view
+			}else{// 否则，加载还没创建的item控件
+				convertView = View.inflate(Mp3ListActivity.this, 
 						R.layout.mp3item, null);
+				holder = new ViewHolder();
+				holder.mp3Name = (TextView)convertView.findViewById(R.id.mp3_item_title);
+				holder.mp3Singer = (TextView)convertView.findViewById(R.id.mp3_item_artist);
+				convertView.setTag(holder);// 绑定存放控件的ViewHolder对象
 			}
-			// 找到item中的元素，并设置相应的数据
-			((TextView) convertView.findViewById(R.id.mp3_item_title))
-					.setText(mAllList.get(position).getMp3name());
-			((TextView) convertView.findViewById(R.id.mp3_item_artist))
-					.setText(mAllList.get(position).getMp3singer());
+			//装载数据
+			MP3 mp3Music = mAllList.get(position);
+			if(mp3Music != null){
+				holder.mp3Name.setText(mp3Music.getMp3name());
+				holder.mp3Singer.setText(mp3Music.getMp3singer());
+			}
 
 			// 　返回组装后的item view
 			return convertView;
