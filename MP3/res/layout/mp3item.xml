@@ -1,32 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    
-    <ImageView 
-        android:id="@+id/itemicon"
-        android:src="@drawable/itemicon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        />
-    
-    <TextView 
-        android:id="@+id/song"
-        style="@style/textview_style"
-        android:textSize="20sp"
-        android:text="歌曲名"
-        android:maxLength="2"
-        />
-    
-    <TextView 
-        android:id="@+id/signer"
-        style="@style/textview_style"
-        android:layout_marginLeft="20px"
-        android:textSize="14sp"
-        android:text="作者"
-        android:textStyle="bold"
-        />
+<!-- 
+	1.android:descendantFocusability：ViewGroup阻止其子View接收焦点
 
-</LinearLayout>
+--> 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/mp3_item_layout"
+	android:layout_width="fill_parent"
+	android:layout_height="52.0dip"
+	android:descendantFocusability="blocksDescendants"
+	android:marqueeRepeatLimit="marquee_forever">
 
+    <ImageView
+	        android:id="@+id/itemicon"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
+	        android:src="@drawable/itemicon" />
+    
+	<RelativeLayout
+	    android:id="@+id/mp3_item_info_layout"
+	    android:layout_width="fill_parent"
+	    android:layout_height="52.0dip"
+	    android:layout_alignParentTop="true"
+	    android:layout_toRightOf="@id/itemicon" >
+
+	    <TextView
+	        android:id="@+id/mp3_item_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginLeft="14.0dip"
+	        android:layout_marginRight="10.0dip"
+	        android:layout_marginTop="4.0dip"
+	        android:marqueeRepeatLimit="marquee_forever"
+	        android:singleLine="true"
+	        android:text="歌曲名称"
+	        android:textSize="18.0dip"
+	        android:textStyle="bold" />
+
+	    <TextView
+	        android:id="@+id/mp3_item_artist"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/mp3_item_title"
+	        android:layout_marginLeft="14.0dip"
+	        android:layout_marginRight="10.0dip"
+	        android:layout_marginTop="4.0dip"
+	        android:singleLine="true"
+	        android:marqueeRepeatLimit="marquee_forever"
+	        android:text="歌手名"
+	        android:textSize="12.0dip" />
+	</RelativeLayout>
+
+</RelativeLayout>
