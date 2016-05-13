@@ -1,5 +1,10 @@
 package com.dhy.mp3;
 
+import java.util.List;
+
+import com.dhy.bean.MP3;
+import com.dhy.utils.DataUtils;
+
 import android.R.anim;
 import android.app.Activity;
 import android.content.Intent;
@@ -39,6 +44,38 @@ public class Mp3ListActivity extends Activity {
 	}
 
 	public class MyListAdapter extends BaseAdapter{
+		private List<MP3> mAllList; // 需要提供的数据集合
+
+		public MyListAdapter(){
+			// 构造方法，用于进行数据初始化
+			this.mAllList = DataUtils.getAllList();
+		}
+		
+		//程序在加载显示到UI上时就要先读取的，获得的值决定了listview显示多少行
+		@Override
+		public int getCount() {
+			// 在实际应用中，此处的返回值是由从数据集合中查询出来的数据的总条数
+			return mAllList.size();
+		}
+
+		// 根据ListView所在位置返回View的组装数据
+		@Override
+		public Object getItem(int position) {
+			return mAllList.get(position);
+		}
+
+		// 根据ListView位置得到数据源集合中的Id
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		// 编写adapter最重要的就是重写此方法，此方法也是决定listview界面的样式
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			return null;
+		}
 		
 	}
 
