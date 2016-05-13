@@ -1,25 +1,25 @@
 /**
  * @author 何广军
  *
- * 2015-9-4
+ * 2015-8-25
  */
 package com.dhy.bean;
 
 
 /**
- * MP3实体类，用于保存从XML文件中读取的数据
+ * MP3实体类
  */
 public class MP3 {
-	
-	private int id; //标识id
+	private int id;// 标识id
 	private String mp3name; // 歌名
 	private long mp3size; // 歌曲长度
 	private String mp3singer; // 歌手名
-	private String lrcname; // 歌词名
+	
+	private String lrcname; // 歌词名称
 	private long lrcsize; // 歌词长度
 	
-	public MP3() {
-		super();
+	public MP3(){
+		
 	}
 
 	public MP3(int id, String mp3name, long mp3size, String mp3singer,
@@ -117,6 +117,4 @@ public class MP3 {
 	}
 	
 	
-	
-
 }

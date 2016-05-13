@@ -52,7 +52,7 @@ public final class R {
         public static final int playtime=0x7f090003;
         public static final int previous=0x7f090006;
         public static final int seekbar=0x7f090004;
-        public static final int srart=0x7f090007;
+        public static final int start=0x7f090007;
         public static final int stop=0x7f090008;
         public static final int text_start=0x7f09000f;
     }
