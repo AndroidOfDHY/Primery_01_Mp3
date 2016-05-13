@@ -22,7 +22,6 @@ public class Mp3PlayerActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_mp3player);
-		
 		initView();
 	}
 
@@ -32,38 +31,33 @@ public class Mp3PlayerActivity extends Activity {
 		ivnext = (ImageView) findViewById(R.id.next);
 		ivstop = (ImageView) findViewById(R.id.stop);
 		mp3title = (TextView) findViewById(R.id.mp3title);
-		
-		ivstart.setOnClickListener(new startOnClickListener());
-		ivprevious.setOnClickListener(new previousOnClickListener());
-		ivnext.setOnClickListener(new nextOnClickListener());
-		ivstop.setOnClickListener(new stopOnClickListener());
-	}
 
-	class startOnClickListener implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			mp3title.setText("开始播放");
-		}
-	}
+		ivstart.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mp3title.setText("开始播放");
+			}
+		});
 
-	class previousOnClickListener implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			mp3title.setText("上一首歌");
-		}
-	}
+		ivprevious.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mp3title.setText("上一首歌");
+			}
+		});
 
-	class nextOnClickListener implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			mp3title.setText("下一首歌");
-		}
-	}
+		ivnext.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mp3title.setText("下一首歌");
+			}
+		});
 
-	class stopOnClickListener implements OnClickListener {
-		@Override
-		public void onClick(View v) {
-			mp3title.setText("停止播放");
-		}
+		ivstop.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mp3title.setText("停止播放");
+			}
+		});
 	}
 }
