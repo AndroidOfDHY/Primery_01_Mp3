@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <resource>
+        <id>0001</id>
+
+        <mp3.name>You Raise Me Up.mp3</mp3.name>
+
+        <mp3.size>4044978</mp3.size>
+
+        <mp3.singer>Westlife</mp3.singer>
+
+        <lrc.name>You Raise Me Up.lrc</lrc.name>
+
+        <lrc.size>1214</lrc.size>
+    </resource>
+    <resource>
+        <id>0002</id>
+
+        <mp3.name>Lemon Tree.mp3</mp3.name>
+
+        <mp3.size>3750787</mp3.size>
+
+        <mp3.singer>Fool S Garden</mp3.singer>
+
+        <lrc.name>Lemon Tree.lrc</lrc.name>
+
+        <lrc.size>2030</lrc.size>
+    </resource>
+
+</resources>
