@@ -1,18 +1,24 @@
 package com.dhy.mp3;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dhy.bean.MP3;
 import com.dhy.utils.DataUtils;
@@ -27,6 +33,9 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			+ "/mp3/";
 	private int position = 0;
 	private List<MP3> mp3s;
+	private SimpleDateFormat sdf;
+	// private Handler handler;
+	private Timer timer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +67,37 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		ivstop = (ImageView) findViewById(R.id.stop);
 		mp3title = (TextView) findViewById(R.id.mp3title);
 		mp3singer = (TextView) findViewById(R.id.mp3singer);
+		playtime = (TextView) findViewById(R.id.playtime);
+		lasttime = (TextView) findViewById(R.id.lasttime);
+		timer = new Timer();
 		ivstart.setOnClickListener(this);
 		ivprevious.setOnClickListener(this);
 		ivstop.setOnClickListener(this);
 		ivnext.setOnClickListener(this);
+		sdf = new SimpleDateFormat("mm:ss", Locale.getDefault());// 设置时间显示格式
+		setTimerTask();
 	}
 
-	private void initMP() {
+	private void setTimerTask() {
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Message message = new Message();
+				message.what = 1;
+				handler.sendMessage(message);
+			}
+		}, 10, 1000); /* 表示10毫秒之後，每隔1000毫秒執行一次 */
+	}
 
+	private Handler handler = new Handler() {
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			// seekbar.setProgress(mp.getCurrentPosition());
+			playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
+		}// 实现消息传递
+	};
+
+	private void initMP() {
 		mp3s = DataUtils.getAllList();
 		position = getIntent().getIntExtra("position", 0);
 		try {
@@ -77,6 +109,8 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			mp3title.setText(mp3s.get(position).getMp3name()
 					.replace(".mp3", ""));
 			mp3singer.setText(mp3s.get(position).getMp3singer());
+			playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));// 当前的播放位置
+			lasttime.setText(sdf.format(new Date(mp.getDuration())));// 总共的播放时间
 		} catch (Exception e) {
 			// Toast.makeText(getApplicationContext(),
 			// "没有找到此歌曲",Toast.LENGTH_SHORT).show();
@@ -101,6 +135,8 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 				mp3title.setText(mp3s.get(position).getMp3name()
 						.replace(".mp3", ""));
 				mp3singer.setText(mp3s.get(position).getMp3singer());
+				playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
+				lasttime.setText(sdf.format(new Date(mp.getDuration())));
 				ivstart.setImageResource(R.drawable.start);
 				isStop = false;
 				isPause = false;
@@ -120,6 +156,9 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 					mp3title.setText(mp3s.get(position).getMp3name()
 							.replace(".mp3", ""));
 					mp3singer.setText(mp3s.get(position).getMp3singer());
+					playtime.setText(sdf.format(new Date(mp
+							.getCurrentPosition())));
+					lasttime.setText(sdf.format(new Date(mp.getDuration())));
 					ivstart.setImageResource(R.drawable.start);
 					isStop = false;
 					isPause = false;
@@ -131,6 +170,9 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 						mp3title.setText(mp3s.get(position).getMp3name()
 								.replace(".mp3", ""));
 						mp3singer.setText(mp3s.get(position).getMp3singer());
+						playtime.setText(sdf.format(new Date(mp
+								.getCurrentPosition())));
+						lasttime.setText(sdf.format(new Date(mp.getDuration())));
 						isStop = false;
 						isPause = false;
 					} catch (Exception e) {
@@ -164,6 +206,8 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 				mp3title.setText(mp3s.get(position).getMp3name()
 						.replace(".mp3", ""));
 				mp3singer.setText(mp3s.get(position).getMp3singer());
+				playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
+				lasttime.setText(sdf.format(new Date(mp.getDuration())));
 				ivstart.setImageResource(R.drawable.start);
 				isStop = false;
 				isPause = false;
@@ -175,4 +219,5 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			break;
 		}
 	}
+
 }
