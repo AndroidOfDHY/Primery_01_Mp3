@@ -23,6 +23,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_mp3player);
 		initView();
+		initMP();
 	}
 
 	private void initView() {
@@ -46,15 +47,55 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.start: // 开始/暂停
 			mp3title.setText("开始播放");
+			if (mp != null) {
+				if (isStop) {
+					try {
+						mp.prepare();
+						mp.start();
+						isStop = false;
+						isPause = false;
+					} catch (Exception e) {
+						mp3title.setText("播放失败");
+						e.printStackTrace();
+					}
+				} else if (isPause) {
+					mp.start();
+					isStop = false;
+					isPause = false;
+				} else if (mp.isPlaying()) {
+					mp.pause();
+					isStop = false;
+					isPause = true;
+				}
+			} else {
+				mp3title.setText("mp为空");
+			}
 			break;
 		case R.id.stop: // 停止
 			mp3title.setText("停止播放");
+			if (mp != null) {
+				mp.stop();
+				isStop = true;
+				isPause = false;
+			}
 			break;
 		case R.id.next: // 下一首
 			mp3title.setText("下一首歌");
 			break;
 		default:
 			break;
+		}
+	}
+
+	private void initMP() {
+		String path = "/sdcard/mp3/hckz.mp3";
+		try {
+			mp = new MediaPlayer();
+			mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			mp.setDataSource(path);
+		} catch (Exception e) {
+			mp3title.setText("播放失败");
+			e.printStackTrace();
 		}
 	}
 }
