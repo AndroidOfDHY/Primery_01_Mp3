@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class Mp3ListActivity extends Activity {
-	//private String[] data = { "多情的月光", "假如爱有天意", "年轮" };
+	// private String[] data = { "多情的月光", "假如爱有天意", "年轮" };
 	private ListView listView = null;
 	public static MyListAdapter listAdapter;
 
@@ -36,13 +36,15 @@ public class Mp3ListActivity extends Activity {
 		listAdapter = new MyListAdapter();
 		listView.setAdapter(listAdapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+			public void onItemClick(AdapterView<?> adapterView, View view,
+					int position, long id) {
 
 				System.out.println("---");
 				// 进行播放处理
 				Log.i("TAG", DataUtils.getAllList().get(position) + "");
-				
-				Intent intent = new Intent(Mp3ListActivity.this, Mp3PlayerActivity.class);
+
+				Intent intent = new Intent(Mp3ListActivity.this,
+						Mp3PlayerActivity.class);
 				intent.putExtra("position", position);
 				startActivity(intent);
 			}
@@ -57,11 +59,11 @@ public class Mp3ListActivity extends Activity {
 		}
 
 		private List<MP3> mAllList;
-		
+
 		public MyListAdapter() {
 			this.mAllList = DataUtils.getAllList();
 		}
-		
+
 		@Override
 		public int getCount() {
 			return mAllList.size();
