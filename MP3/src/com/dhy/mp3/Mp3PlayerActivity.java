@@ -1,5 +1,6 @@
 package com.dhy.mp3;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -54,12 +56,15 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		mp.stop();
 		mp.release();
 		mp = null;
+		timer.cancel();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 		mp.pause();
+		isStop = false;
+		isPause = true;
 	}
 
 	private void initView() {
@@ -108,20 +113,42 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		try {
 			mp = new MediaPlayer();
 			mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-			mp.setDataSource(Path + mp3s.get(position).getMp3name());
-			mp.prepare();
-			seekbar.setMax(mp.getDuration());
-			mp.start();
-			mp3title.setText(mp3s.get(position).getMp3name()
-					.replace(".mp3", ""));
-			mp3singer.setText(mp3s.get(position).getMp3singer());
-			playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));// 当前的播放位置
-			lasttime.setText(sdf.format(new Date(mp.getDuration())));// 总共的播放时间
+			startPLay();
+			if (!isStop) { // 如果是按停止结束的歌曲就不会自动播放下一首
+				mp.setOnCompletionListener(new OnCompletionListener() {
+					@Override
+					public void onCompletion(MediaPlayer mp) {
+						mp.stop();
+						mp.reset();
+						if (position == mp3s.size() - 1) {
+							position = 0;
+						} else {
+							position++;
+						}
+						try {
+							startPLay();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}); // end mp.setOnCompletionListener
+			}// end if(!isStop)
 		} catch (Exception e) {
 			// Toast.makeText(getApplicationContext(),
 			// "没有找到此歌曲",Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 		}
+	}// end initMP
+
+	private void startPLay() throws IOException {
+		mp.setDataSource(Path + mp3s.get(position).getMp3name());
+		mp.prepare();
+		seekbar.setMax(mp.getDuration());
+		mp.start();
+		mp3title.setText(mp3s.get(position).getMp3name().replace(".mp3", ""));
+		mp3singer.setText(mp3s.get(position).getMp3singer());
+		playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));// 当前的播放位置
+		lasttime.setText(sdf.format(new Date(mp.getDuration())));// 总共的播放时间
 	}
 
 	public void onClick(View v) {
@@ -135,15 +162,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 				position--;
 			}
 			try {
-				mp.setDataSource(Path + mp3s.get(position).getMp3name());
-				mp.prepare();
-				seekbar.setMax(mp.getDuration());
-				mp.start();
-				mp3title.setText(mp3s.get(position).getMp3name()
-						.replace(".mp3", ""));
-				mp3singer.setText(mp3s.get(position).getMp3singer());
-				playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
-				lasttime.setText(sdf.format(new Date(mp.getDuration())));
+				startPLay();
 				ivstart.setImageResource(R.drawable.start);
 				isStop = false;
 				isPause = false;
@@ -171,16 +190,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 					isPause = false;
 				} else if (isStop) {
 					try {
-						mp.setDataSource(Path + mp3s.get(position).getMp3name());
-						mp.prepare();
-						seekbar.setMax(mp.getDuration());
-						mp.start();
-						mp3title.setText(mp3s.get(position).getMp3name()
-								.replace(".mp3", ""));
-						mp3singer.setText(mp3s.get(position).getMp3singer());
-						playtime.setText(sdf.format(new Date(mp
-								.getCurrentPosition())));
-						lasttime.setText(sdf.format(new Date(mp.getDuration())));
+						startPLay();
 						isStop = false;
 						isPause = false;
 					} catch (Exception e) {
@@ -188,12 +198,9 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 						e.printStackTrace();
 					}
 				}
-			} else {
-				// mp3title.setText("mp为空");
 			}
 			break;
 		case R.id.stop: // 停止
-			mp3title.setText("停止播放");
 			mp.stop();
 			mp.reset();
 			isStop = true;
@@ -208,15 +215,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 				position++;
 			}
 			try {
-				mp.setDataSource(Path + mp3s.get(position).getMp3name());
-				mp.prepare();
-				seekbar.setMax(mp.getDuration());
-				mp.start();
-				mp3title.setText(mp3s.get(position).getMp3name()
-						.replace(".mp3", ""));
-				mp3singer.setText(mp3s.get(position).getMp3singer());
-				playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
-				lasttime.setText(sdf.format(new Date(mp.getDuration())));
+				startPLay();
 				ivstart.setImageResource(R.drawable.start);
 				isStop = false;
 				isPause = false;
@@ -233,6 +232,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress,
 				boolean fromUser) {
+			// playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
 		}
 
 		@Override
