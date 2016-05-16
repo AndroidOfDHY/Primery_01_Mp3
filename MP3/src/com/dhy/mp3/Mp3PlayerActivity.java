@@ -10,7 +10,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class Mp3PlayerActivity extends Activity {
+public class Mp3PlayerActivity extends Activity implements OnClickListener {
 
 	private TextView mp3title;
 	private ImageView ivstart, ivprevious, ivnext, ivstop;
@@ -26,38 +26,35 @@ public class Mp3PlayerActivity extends Activity {
 	}
 
 	private void initView() {
+		mp3title = (TextView) findViewById(R.id.mp3title);
 		ivstart = (ImageView) findViewById(R.id.start);
 		ivprevious = (ImageView) findViewById(R.id.previous);
 		ivnext = (ImageView) findViewById(R.id.next);
 		ivstop = (ImageView) findViewById(R.id.stop);
-		mp3title = (TextView) findViewById(R.id.mp3title);
 
-		ivstart.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mp3title.setText("开始播放");
-			}
-		});
+		ivstart.setOnClickListener(this);
+		ivprevious.setOnClickListener(this);
+		ivstop.setOnClickListener(this);
+		ivnext.setOnClickListener(this);
+	}
 
-		ivprevious.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mp3title.setText("上一首歌");
-			}
-		});
-
-		ivnext.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mp3title.setText("下一首歌");
-			}
-		});
-
-		ivstop.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				mp3title.setText("停止播放");
-			}
-		});
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.previous: // 上一首
+			mp3title.setText("上一首歌");
+			break;
+		case R.id.start: // 开始/暂停
+			mp3title.setText("开始播放");
+			break;
+		case R.id.stop: // 停止
+			mp3title.setText("停止播放");
+			break;
+		case R.id.next: // 下一首
+			mp3title.setText("下一首歌");
+			break;
+		default:
+			break;
+		}
 	}
 }
