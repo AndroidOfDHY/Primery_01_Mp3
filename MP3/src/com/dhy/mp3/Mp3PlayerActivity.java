@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.dhy.bean.MP3;
@@ -29,13 +31,13 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 	private ImageView ivstart, ivprevious, ivnext, ivstop;
 	private MediaPlayer mp;
 	private boolean isStop = true, isPause = false;
-	private String Path = Environment.getExternalStorageDirectory().getPath()
-			+ "/mp3/";
+	private String Path;
 	private int position = 0;
 	private List<MP3> mp3s;
 	private SimpleDateFormat sdf;
 	// private Handler handler;
 	private Timer timer;
+	private SeekBar seekbar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,8 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		ivstop.setOnClickListener(this);
 		ivnext.setOnClickListener(this);
 		sdf = new SimpleDateFormat("mm:ss", Locale.getDefault());// 设置时间显示格式
+		seekbar = (SeekBar) findViewById(R.id.seekbar);
+		seekbar.setOnSeekBarChangeListener(new SeekBarChangeEvent());
 		setTimerTask();
 	}
 
@@ -92,12 +96,13 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 	private Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
-			// seekbar.setProgress(mp.getCurrentPosition());
+			seekbar.setProgress(mp.getCurrentPosition());
 			playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
 		}// 实现消息传递
-	};
+	};// 这里要加分号，handler是个变量不是方法
 
 	private void initMP() {
+		Path = Environment.getExternalStorageDirectory().getPath() + "/mp3/";
 		mp3s = DataUtils.getAllList();
 		position = getIntent().getIntExtra("position", 0);
 		try {
@@ -105,6 +110,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			mp.setDataSource(Path + mp3s.get(position).getMp3name());
 			mp.prepare();
+			seekbar.setMax(mp.getDuration());
 			mp.start();
 			mp3title.setText(mp3s.get(position).getMp3name()
 					.replace(".mp3", ""));
@@ -131,6 +137,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			try {
 				mp.setDataSource(Path + mp3s.get(position).getMp3name());
 				mp.prepare();
+				seekbar.setMax(mp.getDuration());
 				mp.start();
 				mp3title.setText(mp3s.get(position).getMp3name()
 						.replace(".mp3", ""));
@@ -166,6 +173,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 					try {
 						mp.setDataSource(Path + mp3s.get(position).getMp3name());
 						mp.prepare();
+						seekbar.setMax(mp.getDuration());
 						mp.start();
 						mp3title.setText(mp3s.get(position).getMp3name()
 								.replace(".mp3", ""));
@@ -202,6 +210,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			try {
 				mp.setDataSource(Path + mp3s.get(position).getMp3name());
 				mp.prepare();
+				seekbar.setMax(mp.getDuration());
 				mp.start();
 				mp3title.setText(mp3s.get(position).getMp3name()
 						.replace(".mp3", ""));
@@ -217,6 +226,22 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			break;
 		default:
 			break;
+		}
+	}
+
+	class SeekBarChangeEvent implements OnSeekBarChangeListener {
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+		}
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			mp.seekTo(seekBar.getProgress());
 		}
 	}
 
