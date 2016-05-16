@@ -91,7 +91,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 	protected void onStart() {
 		super.onStart();
 		initMP();
-		showLrc();
+		// showLrc();
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		playtime = (TextView) findViewById(R.id.playtime);
 		lasttime = (TextView) findViewById(R.id.lasttime);
 
-		lrcView = (LycirView) findViewById(R.id.lrc); // 歌词视图
+		// lrcView = (LycirView)findViewById(R.id.lrc); //歌词视图
 	}
 
 	// 初始化MediaPlayer
@@ -225,7 +225,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			try {
 				mp.setDataSource(BASE_PATH + mp3s.get(position).getMp3name());
 				mp.prepare();
-				showLrc();
+				// showLrc();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -249,7 +249,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 				}
 				isStop = false;
 			}
-			showLrc();
+			// showLrc();
 			break;
 		case R.id.stop: // 停止
 			mp.stop();
@@ -257,7 +257,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			seek.setProgress(0);
 			start.setImageResource(R.drawable.start);
 			isStop = true;
-			showLrc();
+			// showLrc();
 			break;
 		case R.id.next: // 下一首
 			mp.stop();
@@ -270,7 +270,7 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 			try {
 				mp.setDataSource(BASE_PATH + mp3s.get(position).getMp3name());
 				mp.prepare();
-				showLrc();
+				// showLrc();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
