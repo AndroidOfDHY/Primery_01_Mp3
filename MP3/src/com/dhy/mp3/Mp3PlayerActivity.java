@@ -1,7 +1,7 @@
 package com.dhy.mp3;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -9,9 +9,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -19,27 +19,65 @@ import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.dhy.bean.LrcContent;
 import com.dhy.bean.MP3;
 import com.dhy.utils.DataUtils;
+import com.dhy.utils.LrcProcess;
+import com.dhy.utils.LycirView;
 
 public class Mp3PlayerActivity extends Activity implements OnClickListener {
 
-	private TextView mp3title, mp3singer, playtime, lasttime;
-	private ImageView ivstart, ivprevious, ivnext, ivstop;
-	private MediaPlayer mp;
-	private boolean isStop = true, isPause = false;
-	private String Path;
+	private boolean isStop = false;
+	private String BASE_PATH = Environment.getExternalStorageDirectory()
+			.getPath() + "/mp3/";
 	private int position = 0;
 	private List<MP3> mp3s;
-	private SimpleDateFormat sdf;
-	// private Handler handler;
-	private Timer timer;
-	private SeekBar seekbar;
+	private SeekBar seek = null;
+	private TextView mp3title, mp3singer, playtime, lasttime;
+	private ImageView start;
+
+	private MediaPlayer mp;
+
+	private Timer timer = new Timer();
+
+	/*
+	 * 歌词处理
+	 */
+	private LrcProcess mLrcProcess; // 歌词处理
+	private List<LrcContent> lrcList = new ArrayList<LrcContent>(); // 存放歌词列表对象
+	private int index = 0; // 歌词检索值
+	private static LycirView lrcView;
+
+	boolean stopThread = false;
+
+	private class VerifyTimerTask extends TimerTask {
+
+		@Override
+		public void run() {
+			if (mp.isPlaying()) {
+				Message msg = new Message();
+				msg.what = 100 * mp.getCurrentPosition() / mp.getDuration();
+				handler.sendMessage(msg);
+			}
+		}
+	};
+
+	private Handler handler = new Handler() {
+
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			seek.setProgress(msg.what);
+			SimpleDateFormat sdf = new SimpleDateFormat("mm:ss",
+					Locale.getDefault());
+			playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,164 +85,179 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_mp3player);
 		initView();
-		initMP();
 	}
 
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		mp.stop();
-		mp.release();
-		mp = null;
-		timer.cancel();
+	protected void onStart() {
+		super.onStart();
+		initMP();
+		showLrc();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 		mp.pause();
-		isStop = false;
-		isPause = true;
+	}
+
+	@Override
+	protected void onDestroy() {
+		stopThread = true;
+		super.onDestroy();
+		mp.stop();
+		mp.release();
+		timer.cancel();
 	}
 
 	private void initView() {
-		ivstart = (ImageView) findViewById(R.id.start);
-		ivprevious = (ImageView) findViewById(R.id.previous);
-		ivnext = (ImageView) findViewById(R.id.next);
-		ivstop = (ImageView) findViewById(R.id.stop);
+		findViewById(R.id.previous).setOnClickListener(this);
+		start = (ImageView) findViewById(R.id.start);
+		start.setOnClickListener(this);
+		findViewById(R.id.stop).setOnClickListener(this);
+		findViewById(R.id.next).setOnClickListener(this);
+		seek = (SeekBar) findViewById(R.id.seekbar);
+		seek.setOnSeekBarChangeListener(new OnSeekBarChangeListenerImpl());
+
 		mp3title = (TextView) findViewById(R.id.mp3title);
 		mp3singer = (TextView) findViewById(R.id.mp3singer);
+
 		playtime = (TextView) findViewById(R.id.playtime);
 		lasttime = (TextView) findViewById(R.id.lasttime);
-		timer = new Timer();
-		ivstart.setOnClickListener(this);
-		ivprevious.setOnClickListener(this);
-		ivstop.setOnClickListener(this);
-		ivnext.setOnClickListener(this);
-		sdf = new SimpleDateFormat("mm:ss", Locale.getDefault());// 设置时间显示格式
-		seekbar = (SeekBar) findViewById(R.id.seekbar);
-		seekbar.setOnSeekBarChangeListener(new SeekBarChangeEvent());
-		setTimerTask();
+
+		lrcView = (LycirView) findViewById(R.id.lrc); // 歌词视图
 	}
 
-	private void setTimerTask() {
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				Message message = new Message();
-				message.what = 1;
-				handler.sendMessage(message);
-			}
-		}, 10, 1000); /* 表示10毫秒之後，每隔1000毫秒執行一次 */
-	}
-
-	private Handler handler = new Handler() {
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			seekbar.setProgress(mp.getCurrentPosition());
-			playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
-		}// 实现消息传递
-	};// 这里要加分号，handler是个变量不是方法
-
+	// 初始化MediaPlayer
 	private void initMP() {
-		Path = Environment.getExternalStorageDirectory().getPath() + "/mp3/";
+		// 获得歌曲列表
 		mp3s = DataUtils.getAllList();
 		position = getIntent().getIntExtra("position", 0);
 		try {
 			mp = new MediaPlayer();
-			mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-			startPLay();
-			if (!isStop) { // 如果是按停止结束的歌曲就不会自动播放下一首
-				mp.setOnCompletionListener(new OnCompletionListener() {
-					@Override
-					public void onCompletion(MediaPlayer mp) {
-						mp.stop();
-						mp.reset();
-						if (position == mp3s.size() - 1) {
-							position = 0;
-						} else {
-							position++;
-						}
-						try {
-							startPLay();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+			mp.setDataSource(BASE_PATH + mp3s.get(position).getMp3name());
+
+			mp.setOnPreparedListener(new OnPreparedListener() {
+
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					mp.start();
+					// 设置歌名、歌手
+					String name = mp3s.get(position).getMp3name()
+							.replace(".mp3", "");
+					mp3title.setText(name);
+					mp3singer.setText(mp3s.get(position).getMp3singer());
+					// 初始化进度条
+					seek.setProgress(0);
+					// 修改播放按钮
+					if (mp.isPlaying()) {
+						start.setImageResource(R.drawable.pause);
 					}
-				}); // end mp.setOnCompletionListener
-			}// end if(!isStop)
+					SimpleDateFormat sdf = new SimpleDateFormat("mm:ss", Locale
+							.getDefault());
+					playtime.setText(sdf.format(new Date(mp
+							.getCurrentPosition())));
+					lasttime.setText(sdf.format(new Date(mp.getDuration())));
+				}
+			});
+
+			mp.setOnCompletionListener(new OnCompletionListener() {
+
+				@Override
+				public void onCompletion(MediaPlayer mp) {
+					mp.stop();
+					mp.reset();
+					if (position == mp3s.size() - 1) {
+						position = 0;
+					} else {
+						position++;
+					}
+					try {
+						mp.setDataSource(BASE_PATH
+								+ mp3s.get(position).getMp3name());
+						mp.prepare();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
+			mp.prepareAsync();
+			// 定时器
+			timer.schedule(new VerifyTimerTask(), 0, 500);
 		} catch (Exception e) {
-			// Toast.makeText(getApplicationContext(),
-			// "没有找到此歌曲",Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 		}
-	}// end initMP
-
-	private void startPLay() throws IOException {
-		mp.setDataSource(Path + mp3s.get(position).getMp3name());
-		mp.prepare();
-		seekbar.setMax(mp.getDuration());
-		mp.start();
-		mp3title.setText(mp3s.get(position).getMp3name().replace(".mp3", ""));
-		mp3singer.setText(mp3s.get(position).getMp3singer());
-		playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));// 当前的播放位置
-		lasttime.setText(sdf.format(new Date(mp.getDuration())));// 总共的播放时间
 	}
 
+	// 进度条监听器
+	private class OnSeekBarChangeListenerImpl implements
+			SeekBar.OnSeekBarChangeListener {
+
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+			// Mp3PlayerActivity.this.text.append("正在拖动，当前值："+seekBar.getProgress());
+		}
+
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			// TODO Auto-generated method stub
+			// Mp3PlayerActivity.this.text.append("开始拖动，当前值："+seekBar.getProgress());
+		}
+
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			// Mp3PlayerActivity.this.text.append("停止拖动，当前值："+seekBar.getProgress());
+			mp.seekTo(seekBar.getProgress() * mp.getDuration() / 100);
+			// mp.start();
+		}
+
+	}
+
+	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.previous: // 上一首
 			mp.stop();
-			mp.reset();// 进入Idle状态
-			if (position == 0) {// 第一首的上一首是最后一首
+			mp.reset();
+			if (position == 0) {
 				position = mp3s.size() - 1;
 			} else {
 				position--;
 			}
 			try {
-				startPLay();
-				ivstart.setImageResource(R.drawable.start);
-				isStop = false;
-				isPause = false;
+				mp.setDataSource(BASE_PATH + mp3s.get(position).getMp3name());
+				mp.prepare();
+				showLrc();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		case R.id.start: // 开始/暂停
-			if (mp != null) {
-				if (mp.isPlaying()) {
-					mp.pause();
-					ivstart.setImageResource(R.drawable.pause);
-					isStop = false;
-					isPause = true;
-				} else if (isPause) {
-					mp.start();
-					mp3title.setText(mp3s.get(position).getMp3name()
-							.replace(".mp3", ""));
-					mp3singer.setText(mp3s.get(position).getMp3singer());
-					playtime.setText(sdf.format(new Date(mp
-							.getCurrentPosition())));
-					lasttime.setText(sdf.format(new Date(mp.getDuration())));
-					ivstart.setImageResource(R.drawable.start);
-					isStop = false;
-					isPause = false;
-				} else if (isStop) {
-					try {
-						startPLay();
-						isStop = false;
-						isPause = false;
-					} catch (Exception e) {
-						// mp3title.setText("播放失败");
-						e.printStackTrace();
-					}
+			if (mp.isPlaying()) {
+				mp.pause();
+				start.setImageResource(R.drawable.start);
+			} else if (!isStop) {
+				mp.start();
+				start.setImageResource(R.drawable.pause);
+			} else {
+				try {
+					mp.setDataSource(BASE_PATH
+							+ mp3s.get(position).getMp3name());
+					mp.prepare();
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+				isStop = false;
 			}
+			showLrc();
 			break;
 		case R.id.stop: // 停止
 			mp.stop();
 			mp.reset();
+			seek.setProgress(0);
+			start.setImageResource(R.drawable.start);
 			isStop = true;
-			isPause = false;
+			showLrc();
 			break;
 		case R.id.next: // 下一首
 			mp.stop();
@@ -215,10 +268,9 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 				position++;
 			}
 			try {
-				startPLay();
-				ivstart.setImageResource(R.drawable.start);
-				isStop = false;
-				isPause = false;
+				mp.setDataSource(BASE_PATH + mp3s.get(position).getMp3name());
+				mp.prepare();
+				showLrc();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -228,21 +280,62 @@ public class Mp3PlayerActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	class SeekBarChangeEvent implements OnSeekBarChangeListener {
-		@Override
-		public void onProgressChanged(SeekBar seekBar, int progress,
-				boolean fromUser) {
-			// playtime.setText(sdf.format(new Date(mp.getCurrentPosition())));
-		}
-
-		@Override
-		public void onStartTrackingTouch(SeekBar seekBar) {
-		}
-
-		@Override
-		public void onStopTrackingTouch(SeekBar seekBar) {
-			mp.seekTo(seekBar.getProgress());
-		}
+	/*
+	 * 显示歌词
+	 */
+	public void showLrc() {
+		mLrcProcess = new LrcProcess();
+		// 读取歌词文件
+		mLrcProcess
+				.readLRC(mp3s.get(position).getMp3name().replace(".mp3", ""));
+		// 传回处理后的歌词文件
+		lrcList = mLrcProcess.getLrcList();
+		Mp3PlayerActivity.lrcView.setmLrcList(lrcList);
+		// 切换带动画显示歌词
+		Mp3PlayerActivity.lrcView.setAnimation(AnimationUtils.loadAnimation(
+				Mp3PlayerActivity.this, R.anim.alpha_z));
+		handler.post(mRunnable); // 启动线程
 	}
 
+	Runnable mRunnable = new Runnable() {
+		public void run() {
+			if (!stopThread) {
+				Mp3PlayerActivity.lrcView.setIndex(lrcIndex());
+				Mp3PlayerActivity.lrcView.invalidate();
+				handler.postDelayed(mRunnable, 100); // 定时更新
+			}
+		};
+	};
+
+	/**
+	 * 根据时间获取歌词显示的索引值
+	 * 
+	 * @return
+	 */
+	public int lrcIndex() {
+		int currentTime = 0;
+		int duration = 0;
+		if (mp.isPlaying()) {
+			currentTime = mp.getCurrentPosition();
+			duration = mp.getDuration();
+		}
+		if (currentTime < duration) {
+			for (int i = 0; i < lrcList.size(); i++) {
+				if (i < lrcList.size() - 1) {
+					if (currentTime < lrcList.get(i).getLrcTime() && i == 0) { // 还没开始
+						index = i;
+					}
+					if (currentTime > lrcList.get(i).getLrcTime()
+							&& currentTime < lrcList.get(i + 1).getLrcTime()) {
+						index = i; // 歌曲在当前歌词和下一句歌词中间
+					}
+				}
+				if (i == lrcList.size() - 1
+						&& currentTime > lrcList.get(i).getLrcTime()) { // 歌曲放完，并且歌词在最后一句
+					index = i;
+				}
+			}
+		}
+		return index;
+	}
 }
